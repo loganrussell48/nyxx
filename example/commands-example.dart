@@ -57,16 +57,15 @@ void main() {
   bot.onMessageReceived.listen((e) {
     var m = e.message;
     var c = m.channel;
-    if(!isCommand(m)){
+    if (!isCommand(m) && !m.author.bot) {
       if (usersToMock.contains(m.author.id)) {
-        if(mockProbability.chance) {
+        if (mockProbability.chance) {
           var mockedMessage = m.content.altCaps;
-          if(mockedMessage != m.content){
+          if (mockedMessage != m.content) {
             c.send(content: m.content.altCaps);
           }
         }
-      }
-      else if (m.author.id != bot.self.id) {
+      } else if (m.author.id != bot.self.id) {
         print(m.content);
         print(m.author.id);
         if (!m.content.startsWith(_prefix)) {
@@ -263,7 +262,9 @@ Future<void> shutDown(CommandContext context) async {
   await context.reply(content: 'Shutting down...');
   saveCurrentAdmins();
   saveMockUser();
-  Future.wait([bot.close(), bot.dispose()]).whenComplete(() => exit(0));
+  Future.wait([bot.close(), bot.dispose()]).whenComplete(() async =>
+      ProcessResult pr = await Process.run(r'.\restart.bat', [])
+  );
 }
 
 @Command('help')
@@ -289,11 +290,51 @@ void loadSavedAdmins() {
 
 @Command(Commands.test)
 @Restrict(admin: true)
-Future<void> test(
-    CommandContext context, User user, String messageContentIHope) async {
-  print('MessageContentIHope: $messageContentIHope');
-  print(user.username);
-  print(user.discriminator);
+Future<void> test(CommandContext context) async {
+  var channel = context.message.channel;
+  var embed = EmbedBuilder()
+    ..title = "title ~~(did you know you can have markdown here too?)~~"
+    ..description =
+        "this supports [named links](https://discordapp.com) on top of the previously shown subset of markdown. ```\nyes, even code blocks```"
+    ..url = "https://discordapp.com"
+    ..color = DiscordColor.fromInt(13369286)
+    ..timestamp = DateTime.parse("2019-01-11T13:04:07.042Z")
+    ..addFooter((footer) {
+      footer.iconUrl = "https://cdn.discordapp.com/embed/avatars/0.png";
+      footer.text = "footer text";
+    })
+    ..thumbnailUrl = "https://cdn.discordapp.com/embed/avatars/0.png"
+    ..imageUrl = "https://cdn.discordapp.com/embed/avatars/0.png"
+    ..addAuthor((author) {
+      author.iconUrl = "https://cdn.discordapp.com/embed/avatars/0.png";
+      author.name = "author name";
+      author.url = "https://discordapp.com";
+    })
+    ..addField(
+        name: "🤔",
+        content: "some of these properties have certain limits...",
+        inline: false)
+    ..addField(
+        name: "😱", content: "try exceeding some of them!", inline: false)
+    ..addField(
+        name: "🙄",
+        content:
+            "an informative error should show up, and this view will remain as-is until all issues are fixed",
+        inline: false)
+    ..addField(
+        name: "<:thonkang:219069250692841473>",
+        content: "these last two",
+        inline: true)
+    ..addField(
+        name: "<:thonkang:219069250692841473>",
+        content: "are inline fields",
+        inline: true);
+
+// Send embed via appropriate method: ISend#send or CommandContext#reply
+  await channel.send(
+      content:
+          "this `supports` __a__ **subset** *of* ~~markdown~~ 😃 ```js\nfunction foo(bar) {\n  console.log(bar);\n}\n\nfoo(1);```",
+      embed: embed);
 }
 
 @Command("mock")
@@ -302,21 +343,23 @@ Future<void> mock(CommandContext context, User user) async {
   if (user == null)
     await context.reply(
         content:
-        'Invalid syntax. Must be exactly 2 tokens. 1. ${_prefix}${Commands.removeAdminLong} 2. <id> (NOT username)\nCommand alias: ${Commands.removeAdminShort}');
+            'Invalid syntax. Must be exactly 2 tokens. 1. ${_prefix}${Commands.removeAdminLong} 2. <id> (NOT username)\nCommand alias: ${Commands.removeAdminShort}');
   else {
     var added = usersToMock.add(user.id);
     if (added)
-      await context.reply(content: '${user.mention} will now be mocked by ${bot.self.mention}');
+      await context.reply(
+          content: '${user.mention} will now be mocked by ${bot.self.mention}');
     else
       await context.reply(
           content:
-          'User: ${user.mention} was not added to the mock list. Maybe the\'re already being mocked?');
+              'User: ${user.mention} was not added to the mock list. Maybe the\'re already being mocked?');
   }
 }
 
 @Command(Commands.kingLong, aliases: [Commands.kingShort])
 Future<void> king(CommandContext context) async {
-  await context.reply(content: 'https://pbs.twimg.com/media/ESP2r_bUUAAcgTs.jpg');
+  await context.reply(
+      content: 'https://pbs.twimg.com/media/ESP2r_bUUAAcgTs.jpg');
 //  await context.message.delete();
 }
 
