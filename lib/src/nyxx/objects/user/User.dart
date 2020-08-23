@@ -38,6 +38,8 @@ class User extends SnowflakeEntity with ISend, Mentionable {
     this.bot = raw['bot'] as bool ?? false;
   }
 
+
+
   /// The user's avatar, represented as URL.
   String avatarURL({String format = 'webp', int size = 128}) {
     if (this.avatar != null)

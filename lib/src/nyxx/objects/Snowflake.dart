@@ -11,6 +11,8 @@ class Snowflake implements Comparable<Snowflake> {
   /// Creates new instance of [Snowflake].
   Snowflake(dynamic id) : _id = id.toString();
 
+  const Snowflake.of(String id) : _id = id;
+
   /// Creates synthetic snowflake based on current time
   Snowflake.fromNow() : _id = _parseId(DateTime.now());
 

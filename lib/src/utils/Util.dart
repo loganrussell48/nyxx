@@ -43,7 +43,7 @@ String getSymbolName(Symbol symbol) {
       .replaceAll(")", "");
 }
 
-/// Simple foramt function implementation
+/// Simple format function implementation
 /// %0% will be replaced with first list element, %1% with second...
 ///
 /// ```

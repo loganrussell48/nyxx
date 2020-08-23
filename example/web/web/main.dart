@@ -1,4 +1,5 @@
 import 'dart:html';
+
 import 'package:nyxx/Browser.dart';
 import 'package:nyxx/nyxx.dart';
 

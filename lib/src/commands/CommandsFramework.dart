@@ -26,7 +26,7 @@ class CommandsFramework {
   StreamController<CommandExecutionError> _onError;
   Stream<CommandExecutionError> onError;
 
-  List<Snowflake> _admins;
+  Set<Snowflake> _admins;
   final Logger _logger = Logger("CommandsFramework");
 
   /// Prefix needed to dispatch a commands.
@@ -41,7 +41,7 @@ class CommandsFramework {
       Stream<MessageEvent> stream,
       Duration roundupTime = const Duration(minutes: 2),
       bool ignoreBots = true,
-      List<Snowflake> admins = const []}) {
+      Set<Snowflake> admins = const <Snowflake>{}}) {
     this._commands = List();
     _cooldownCache = CooldownCache(roundupTime);
     _admins = admins;
@@ -69,6 +69,14 @@ class CommandsFramework {
         Future(() => _dispatch(e));
       });
     });
+  }
+
+  bool addAdmin(Snowflake id){
+    return _admins.add(id);
+  }
+
+  bool removeAdmin(Snowflake id){
+    return _admins.remove(id);
   }
 
   /// Allows to register new converters for custom type
@@ -518,8 +526,8 @@ class CommandsFramework {
   }
 
   bool _isUserAdmin(Snowflake authorId, Guild guild) {
-    if (guild == null) return true;
-
-    return (_admins.any((i) => i == authorId)) || guild.owner.id == authorId;
+    return guild == null
+        ? true
+        : _admins.contains(authorId) || guild.owner.id == authorId;
   }
 }
