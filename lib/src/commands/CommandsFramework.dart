@@ -530,4 +530,9 @@ class CommandsFramework {
         ? true
         : _admins.contains(authorId) || guild.owner.id == authorId;
   }
+
+  String help() {
+    List<String> commandHelpMessages = _commands.map(_CommandMetadata.helpMessage).toList();
+    return commandHelpMessages.join('\n');
+  }
 }

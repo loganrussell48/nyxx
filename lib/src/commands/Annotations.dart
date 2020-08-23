@@ -23,13 +23,15 @@ class Command {
 }
 
 /// Defines additional properties which will restrict user access to command
-/// All fields are optional and wont affect command execution of not set.
+/// All fields are optional and wont affect command execution if not set.
 class Restrict {
   /// Checks if user is in admins list provided at creating CommandsFramework
   final bool admin;
+  static const bool defaultAdmin = false;
 
   /// List of roles required to execute command
   final List<Snowflake> roles;
+  static const List<Snowflake> defaultRoles = [];
 
   /// List of required permissions to invoke command
   final List<int> userPermissions;
@@ -39,6 +41,7 @@ class Restrict {
 
   /// Cooldown for command in seconds
   final int cooldown;
+  static const int defaultCooldown = 0;
 
   /// Allows to restrict command to be used only on guild or only in DM or both
   final ContextType requiredContext;
@@ -54,15 +57,27 @@ class Restrict {
   final List<String> topics;
 
   const Restrict(
-      {this.admin = false,
-      this.roles = const [],
-      this.cooldown = 0,
+      {this.admin = defaultAdmin,
+      this.roles = defaultRoles,
+      this.cooldown = defaultCooldown,
       this.userPermissions = const [],
       this.botPermissions = const [],
       this.requiredContext,
       this.nsfw = false,
       this.requireVoice = false,
       this.topics = const []});
+
+  @override
+  String toString() {
+    var res = '';
+    if(admin != defaultAdmin)
+      res += '*admin only* ';
+    if(roles != defaultRoles)
+      res += 'roles: ' + roles.join(' ')+ ' ';
+    if(cooldown != defaultCooldown)
+      res += 'cooldown: ' + cooldown.toString() +' ';
+    return res;
+  }
 }
 
 /// Captures all remaining command text into `List<String>` or `String`
